@@ -3,15 +3,14 @@
 namespace App\Listeners;
 
 use App\Events\TranslationMissing;
-use App\Jobs\TranslateMissingTranslationJob;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Jobs\TranslationMissingJob;
 
 class Translations
 {
+
     public function onTranslationMissing(TranslationMissing $event): bool
     {
-        $job = new TranslateMissingTranslationJob($event->key);
+        $job = new TranslationMissingJob($event->key);
         dispatch($job);
 
         return true;

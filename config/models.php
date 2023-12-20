@@ -99,7 +99,7 @@ return [
         |
         */
 
-        'timestamps' => true,
+        'timestamps' => false,
 
         // 'timestamps' => [
         //     'enabled' => true,
@@ -123,7 +123,7 @@ return [
         |
         */
 
-        'soft_deletes' => true,
+        'soft_deletes' => false,
 
         // 'soft_deletes' => [
         //     'enabled' => true,
@@ -154,7 +154,7 @@ return [
         |
         */
 
-        'per_page' => 15,
+        'per_page' => 50,
 
         /*
         |--------------------------------------------------------------------------
@@ -170,7 +170,7 @@ return [
         |
         */
 
-        'base_files' => false,
+        'base_files' => true,
 
         /*
         |--------------------------------------------------------------------------
@@ -229,7 +229,7 @@ return [
         */
 
         'hidden' => [
-            '*secret*', '*password', '*token',
+            '*secret*', '*password', '*token', 'user_pass', 'token_nonce', 'user_hash'
         ],
 
         /*
@@ -393,7 +393,7 @@ return [
          | that helps to avoid typos in strings when typing field names and allows to use
          | code competition with available model's field names.
          */
-        'with_property_constants' => false,
+        'with_property_constants' => true,
 
         /*
         |--------------------------------------------------------------------------
@@ -447,7 +447,7 @@ return [
         | NOTE: This requires PHP 7.0 or later.
         |
         */
-        'enable_return_types' => false,
+        'enable_return_types' => true,
     ],
 
     /*

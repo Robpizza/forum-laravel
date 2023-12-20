@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('translation_group', 255);
             $table->string('translation_key', 255);
             $table->longText('translation_text');
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('translation_createdate')->useCurrent();
+            $table->timestamp('translation_changedate')->useCurrent()->useCurrentOnUpdate();
         });
     }
 
