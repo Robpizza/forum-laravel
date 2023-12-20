@@ -4,28 +4,14 @@ namespace App\Jobs;
 
 use Alessiodh\Deepltranslator\Traits\DeepltranslatorTrait;
 use App\Models\SystemTranslation;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use PHPUnit\Event\Telemetry\System;
 
 class TranslateMissingTranslationJob implements ShouldQueue, ShouldBeUnique
 {
     use DeepltranslatorTrait;
 
     public string $key;
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(string $key)
-    {
-        $this->key = $key;
-    }
-
 
     /**
      * Gets the Translation Key
@@ -35,6 +21,15 @@ class TranslateMissingTranslationJob implements ShouldQueue, ShouldBeUnique
     {
         return $this->key;
     }
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(string $key)
+    {
+        $this->key = $key;
+    }
+
 
     /**
      * Translates a missing Translation using DeepL
