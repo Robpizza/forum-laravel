@@ -4,14 +4,24 @@ namespace App\Jobs;
 
 use Alessiodh\Deepltranslator\Traits\DeepltranslatorTrait;
 use App\Models\SystemTranslation;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
-class TranslateMissingTranslationJob implements ShouldQueue, ShouldBeUnique
+class TranslationMissingJob implements ShouldQueue, ShouldBeUnique
 {
-    use DeepltranslatorTrait;
+    use DeepltranslatorTrait, Queueable, InteractsWithQueue;
 
-    public string $key;
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [60, 60, 300];
+    }
 
     /**
      * Gets the Translation Key
@@ -22,43 +32,37 @@ class TranslateMissingTranslationJob implements ShouldQueue, ShouldBeUnique
         return $this->key;
     }
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(string $key)
+    public string $key;
+
+    public function __construct($key)
     {
         $this->key = $key;
     }
 
-
-    /**
-     * Translates a missing Translation using DeepL
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(): bool
     {
         if (!empty($this->key)) {
-            // Search BINARY so its case sensitive
-            $systemTranslation = SystemTranslation::whereRaw('BINARY ' . SystemTranslation::TRANSLATION_KEY . ' = ?', [
-                $this->key
-            ])->where(SystemTranslation::TRANSLATION_GROUP, '=', '*')->first();
-
-            if (empty($systemTranslation)) {
-                // Create a new SystemTranslation if it does not exist.
-                $systemTranslation                      = new SystemTranslation;
-                $systemTranslation->translation_key     = $this->key;
-                $systemTranslation->translation_group   = '*';
+            $languageLine = SystemTranslation::whereRaw('BINARY ' . SystemTranslation::TRANSLATION_KEY . ' = ?', [
+                $this->key,
+            ])->where(SystemTranslation::TRANSLATION_GROUP, '*')->first();
+            if (empty($languageLine)) {
+                $languageLine = new SystemTranslation;
+                $languageLine->translation_key = $this->key;
+                $languageLine->translation_group = '*';
             }
 
-            $locales = ['nl', 'en'];
+            $locales = [];
+            foreach (config('app.locales') as $tmpLocale) {
+                if ($tmpLocale === 'nl') continue;
+                $locales[] = $tmpLocale;
+            }
 
             // Translate using DeepL
             $translated = $this->translateString($this->key, 'nl', $locales);
-
-            // Update the SystemTranslation
-            $systemTranslation->fill([
+            $languageLine->fill([
                 SystemTranslation::TRANSLATION_TEXT => $translated,
             ])->save();
         }
+        return true;
     }
 }
